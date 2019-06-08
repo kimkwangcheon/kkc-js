@@ -7,10 +7,124 @@
         <script>
             document.getElementById("file").addEventListener('change', readFile, false);
             var fileData;
-            alert(123);
+            
             function readFile(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                
+                if(!file) return;
 
+                reader.onload = function(e) {
+                    fileData = e.target.result;
+                    
+                    // 날짜형식 입력 및 검사
+                    var prompt;
+                    var regex_ymd = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$/;
+                    
+                    while(!regex_ymd.test(prompt)) {
+                        prompt = window.prompt("가져올 날짜를 입력하세요(yyyy-mm-dd)");
+                        if(prompt == null) return;
+                        if(!regex_ymd.test(prompt)) alert("날짜형식이 잘못되었습니다. 다시 입력하여 주십시오");
+                    }
+
+                    // 입력한 날짜의 대화내용만 배열에 저장
+                    var prompt_y = prompt.substring(0,4);
+                    var prompt_m = prompt.substring(5,7) < 10 ? prompt.substring(6,7) : prompt.substring(5,7);
+                    var prompt_d = prompt.substring(8,10) < 10 ? prompt.substring(9,10) : prompt.substring(8,10);
+                    var regex = eval('/'+ prompt_y + '.*' + prompt_m + '.*' + prompt_d + '/g');
+                    var lines = fileData.split(/[\r\n]+/g);
+                    var custom_lines = [];
+
+                    var sw = "N";
+                    for(var i=0; i<lines.length; i++) {
+                        // '-'로 시작하면
+                        if(/^-/.test(lines[i])) {
+                            // 날짜 체크 후 스위치 설정
+                            if(regex.test(lines[i]))
+                                sw = "Y";
+                            else
+                                sw = "N";
+
+                            if(sw == "Y") custom_lines.push(lines[i]);
+                        } else {
+                            if(sw == "Y") custom_lines.push(lines[i]);
+                        }
+                    }
+
+                    // 이름과 MSG를 객체 형태로 배열에 저장
+                    var katalkArr = [];
+                    var nameIdx = 0;
+                    for(var i=0; i<custom_lines.length; i++) {
+                        nameIdx = custom_lines[i].indexOf("]");
+                        var tmpName = custom_lines[i].substring(1,nameIdx);
+                        var msgRegex = /(\[([^\]]+)\])(|[\s]+){2}/
+                        var tmpMsg = custom_lines[i].replace(msgRegex,'').trim();
+
+                        if(nameIdx > -1)
+                            katalkArr.push( {name: tmpName, msg: tmpMsg} );
+                    }
+
+                    // name정보 정렬 후 -> 이름별 count값 저장
+                    var cnt = 1;
+                    var kaTalkCnt = [];
+                    var kaTalkArrPlus;
+                    console.log("katalkArr[2]: " + katalkArr);
+                    hangelAsc(katalkArr);
+                    console.log("katalkArr[2]: " + katalkArr);
+                    for(var i=0; i<=katalkArr.length; i++) {
+                        kaTalkArrPlus = katalkArr[i+1];
+
+                        if(i == katalkArr.length-1) {
+                            kaTalkCnt.push( {name: katalkArr[i].name, count: cnt} );
+                            break;
+                        }
+                        if(katalkArr[i].name == kaTalkArrPlus.name) {
+                            cnt++;
+                        } else {
+                            kaTalkCnt.push( {name: katalkArr[i].name, count: cnt} );
+                            cnt = 1;
+                        }
+                    }
+
+                    // msg수 내림차순 정렬 후, 테이블에 출력
+                    numberDesc(kaTalkCnt);
+                    var msgCntArea = document.getElementById("msgCntArea");
+                    var tdArr = [];
+                    for(var i=0; i<kaTalkCnt.length; i++) {
+                        tdArr.push("<tr>");
+                        tdArr.push("<td>"+(i+1)+"</td>");
+                        tdArr.push("<td>"+kaTalkCnt[i].name+"</td>");
+                        tdArr.push("<td>"+kaTalkCnt[i].count+"</td>");
+                        tdArr.push("</tr>");
+                    }
+                    msgCntArea.innerHTML = tdArr.join("");
+                    
+                }
+                reader.readAsText(file, "UTF-8");
+            }
+
+            function hangelAsc(array) {
+                array.sort(function(a,b) {
+                    return a.name < b.name ? -1 : a.name > b.name ? 1 : 0; 
+                });
+            }
+            function numberDesc(array) {
+                array.sort(function(a, b){
+                    return b.count - a.count;
+                });
             }
         </script>
+
+        <p></p>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>순위</th>
+                    <th>이름</th>
+                    <th>대화수</th>
+                </tr>
+            </thead>
+            <tbody id="msgCntArea"></tbody>
+        </table>
     </body>
 </html>
