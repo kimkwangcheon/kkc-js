@@ -45,7 +45,7 @@
                 $("#dateBtn").on("click", function(){
                     var params = $("#frmDate").serialize();
                     $.ajax({
-                        type : "POST",
+                        type : "GET",
                         url : "kakaoTalk-ranking_refact.html",
                         data : params,
                         dataType : "text",
