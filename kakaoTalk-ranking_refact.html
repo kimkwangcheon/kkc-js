@@ -19,6 +19,7 @@
                     조회기간:
                     <input type="text" id="datepicker1" name="sdate"> ~
                     <input type="text" id="datepicker2" name="edate">
+                    <input type="hidden" id="arr" name="arr">
                     <input type="submit" value="조회" id="dateBtn" />
                 </form>
             </p>
@@ -57,10 +58,8 @@
                             // console.log(data);
                             var sdate = getParameterByName("sdate", this.url);
                             var edate = getParameterByName("edate", this.url);
-
-                            document.getElementById("file").addEventListener(function(e){
-                                readFile(e);
-                            });
+                            var arr = getParameterByName("arr", this.url);
+                            
                         },
                         error : function(xhr, status, error) {
                             alert(error);
@@ -85,6 +84,8 @@
                     var lines = fileData.split(/[\r\n]+/g);
 
                     var kaTalkCnt = msgCount(lines);
+
+                    $("#arr").val(kaTalkCnt);
 
                     // msg수 내림차순 정렬 후, 테이블에 출력
                     numberDesc(kaTalkCnt);
