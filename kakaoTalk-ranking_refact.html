@@ -58,7 +58,9 @@
                             var sdate = getParameterByName("sdate", this.url);
                             var edate = getParameterByName("edate", this.url);
 
-                            document.getElementById("file").addEventListener(readFile, false);
+                            document.getElementById("file").addEventListener(function(e){
+                                readFile(e);
+                            });
                         },
                         error : function(xhr, status, error) {
                             alert(error);
