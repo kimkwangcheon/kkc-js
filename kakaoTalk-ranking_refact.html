@@ -19,7 +19,6 @@
                     조회기간:
                     <input type="text" id="datepicker1" name="sdate"> ~
                     <input type="text" id="datepicker2" name="edate">
-                    <input type="hidden" id="arr" name="arr">
                     <input type="submit" value="조회" id="dateBtn" />
                 </form>
             </p>
@@ -58,8 +57,7 @@
                             // console.log(data);
                             var sdate = getParameterByName("sdate", this.url);
                             var edate = getParameterByName("edate", this.url);
-                            var arr = getParameterByName("arr", this.url);
-                            
+                            ajaxSuccessResult();
                         },
                         error : function(xhr, status, error) {
                             alert(error);
@@ -67,6 +65,26 @@
                     });
                 });
             });
+
+            // ajax - success 후 실행
+            function ajaxSuccessResult() {
+                var lines = fileData.split(/[\r\n]+/g);
+
+                var kaTalkCnt = msgCount(lines);
+
+                // msg수 내림차순 정렬 후, 테이블에 출력
+                numberDesc(kaTalkCnt);
+                var msgCntArea = document.getElementById("msgCntArea");
+                var tdArr = [];
+                for(var i=5; i<kaTalkCnt.length; i++) {
+                    tdArr.push("<tr>");
+                    tdArr.push("<td>"+(i+1)+"</td>");
+                    tdArr.push("<td>"+kaTalkCnt[i].name+"</td>");
+                    tdArr.push("<td>"+kaTalkCnt[i].count+"</td>");
+                    tdArr.push("</tr>");
+                }
+                msgCntArea.innerHTML = tdArr.join("");
+            }
 
             // 파일 불러오기에서 파일 선택 시 실행됨
             document.getElementById("file").addEventListener('change', readFile, false);
@@ -84,8 +102,6 @@
                     var lines = fileData.split(/[\r\n]+/g);
 
                     var kaTalkCnt = msgCount(lines);
-
-                    $("#arr").val(kaTalkCnt);
 
                     // msg수 내림차순 정렬 후, 테이블에 출력
                     numberDesc(kaTalkCnt);
