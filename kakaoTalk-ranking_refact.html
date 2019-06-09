@@ -54,8 +54,11 @@
                             xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
                         },
                         success : function(data){
-                            console.log(data);
-                            console.log(getParameterByName("sdate",this.url));
+                            // console.log(data);
+                            var sdate = getParameterByName("sdate", this.url);
+                            var edate = getParameterByName("edate", this.url);
+
+                            readFile();
                         },
                         error : function(xhr, status, error) {
                             alert(error);
