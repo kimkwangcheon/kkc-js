@@ -114,7 +114,7 @@
                             if(sw == "Y") custom_lines.push(lines[i]);
                         } else {
                             if(sw == "Y") custom_lines.push(lines[i]);
-                            else break;
+                            // else break;
                         }
                     }
 
@@ -128,7 +128,7 @@
                 numberDesc(kaTalkCnt);
                 var msgCntArea = document.getElementById("msgCntArea");
                 var tdArr = [];
-                for(var i=5; i<kaTalkCnt.length; i++) {
+                for(var i=0; i<kaTalkCnt.length; i++) {
                     tdArr.push("<tr>");
                     tdArr.push("<td>"+(i+1)+"</td>");
                     tdArr.push("<td>"+kaTalkCnt[i].name+"</td>");
