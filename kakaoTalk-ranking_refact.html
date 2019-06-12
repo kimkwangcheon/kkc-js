@@ -91,7 +91,7 @@
                     var dateSw = "N";
                     for(var i=0; i<lines.length; i++) {
                         // '-'로 시작하면
-                        if(/^-/.test(lines[i])) {
+                        if(/^-.*년.*월.*일.*요일/.test(lines[i])) {
                             // 날짜 체크 후 스위치 설정
                             if(sdateRegex.test(lines[i])) {
                                 sw = "Y";
@@ -114,7 +114,6 @@
                             if(sw == "Y") custom_lines.push(lines[i]);
                         } else {
                             if(sw == "Y") custom_lines.push(lines[i]);
-                            // else break;
                         }
                     }
                     for(var i=0; i<custom_lines.length; i++) {
