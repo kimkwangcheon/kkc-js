@@ -98,16 +98,20 @@
                                 dateSw = "Y";
                             }
                             else {
-                                if(dateSw == "Y") {
-                                    if(edateRegex.test(lines[i])) {
-                                        sw = "Y";
-                                        dateSw = "N";
+                                // 시작날짜와 끝날짜가 같으면 sw="N" (custom_lines 배열에 저장하지 않음)
+                                if(params.sdate == params.edate) sw = "N";
+                                else {
+                                    if(dateSw == "Y") {
+                                        if(edateRegex.test(lines[i])) {
+                                            sw = "Y";
+                                            dateSw = "N";
+                                        }
+                                        else {
+                                            sw = "Y";
+                                        }
+                                    } else {
+                                        sw = "N";
                                     }
-                                    else {
-                                        sw = "Y";
-                                    }
-                                } else {
-                                    sw = "N";
                                 }
                             }
 
