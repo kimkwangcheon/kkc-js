@@ -1,6 +1,6 @@
 <html>
     <head>
-        <!-- jQuery UI datepicker -->
+        <!-- jQuery UI datepicker : Start -->
         <!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
@@ -8,6 +8,17 @@
         <script src="js/jquery-1.12.4.js"></script>
         <script src="js/jquery-ui.min.js"></script>
         <script src="js/datepicker-ko.js"></script>
+        <!-- jQuery UI datepicker : End -->
+
+        <!-- morris.js : Start -->
+        <link rel="stylesheet" href="css/morris.css">
+        <script src="js/raphael-min.js"></script>
+        <script src="js/morris.min.js"></script>
+        <!-- jQuery UI datepicker : End -->
+
+        <style>
+            .kakao-chart { height: 250px; width: 100%; line-height: 250px; text-align: center; background: #eaeaea; }
+        </style>
     </head>
     <body>
         <div style="padding: 20px;">
@@ -22,6 +33,11 @@
                     <input type="submit" value="조회" id="dateBtn" />
                 </form>
             </p>
+            
+            <!-- 차트 출력 영역 -->
+            <div class="kakao-chart" id="kakao-chart"><span id="kakaoChartArea">차트 출력 영역</span></div>
+
+            <p></p>
             <table border="1">
                 <thead>
                     <tr>
@@ -41,7 +57,7 @@
                     dateFormat: 'yy.mm.dd'
                 });
 
-                // 기간 조회 클릭 시
+                // 기간 지정 후 '조회' 버튼 클릭 시
                 $("#dateBtn").on("click", function(){
                     var params = $("#frmDate").serialize();
                     $.ajax({
@@ -70,7 +86,7 @@
                 });
             });
 
-            // ajax - success 후 실행
+            // ajax - success 후 실행 ('조회'버튼 누른 후)
             function ajaxSuccessResult(params) {
                 var lines = fileData.split(/[\r\n]+/g);
 
@@ -95,21 +111,23 @@
                             // 날짜 체크 후 스위치 설정
                             if(sdateRegex.test(lines[i])) {
                                 sw = "Y";
-                                dateSw = "Y";
+                                dateSw = "Y";   // dateSw : 스위치가 켜져있으면, 배열에 계속 저장
                             }
                             else {
-                                // 시작날짜와 끝날짜가 같으면 sw="N" (custom_lines 배열에 저장하지 않음)
+                                // 시작날짜와 끝날짜가 같으면 sw="N" (배열에 저장하지 않음)
                                 if(params.sdate == params.edate) sw = "N";
                                 else {
                                     if(dateSw == "Y") {
+                                        // 끝날짜가 같으면, 저장을 멈출 준비(=dateSw를 끔)
                                         if(edateRegex.test(lines[i])) {
                                             sw = "Y";
                                             dateSw = "N";
                                         }
-                                        else {
+                                        else {  // 끝날짜가 다르면 계속 저장
                                             sw = "Y";
                                         }
                                     } else {
+                                        // dateSw가 꺼져있으면, sw도 끄기
                                         sw = "N";
                                     }
                                 }
@@ -144,7 +162,7 @@
                 msgCntArea.innerHTML = tdArr.join("");
             }
 
-            // 파일 불러오기에서 파일 선택 시 실행됨
+            // 파일 불러오기에서 파일 선택 시, 실행
             document.getElementById("file").addEventListener('change', readFile, false);
             var fileData;
 
@@ -161,8 +179,27 @@
 
                     var kaTalkCnt = msgCount(lines);
 
-                    // msg수 내림차순 정렬 후, 테이블에 출력
+                    // msg수 내림차순 정렬
                     numberDesc(kaTalkCnt);
+
+                    // 차트 출력
+                    new Morris.Bar({
+                        element: 'kakao-chart',
+                        data: [
+                            { y: ' 출력값 ',
+                              a: kaTalkCnt[0].count,
+                              b: kaTalkCnt[1].count,
+                              c: kaTalkCnt[2].count
+                            }
+                        ],
+                        xkey: 'y',
+                        ykeys: ['a', 'b','c'],
+                        labels: [kaTalkCnt[0].name, kaTalkCnt[1].name,kaTalkCnt[2].name]
+                    });
+                    $("#kakao-chart").removeClass("kakao-chart");
+                    $("#kakao-chart #kakaoChartArea").text("");  
+
+                    // 테이블에 순위값 출력
                     var msgCntArea = document.getElementById("msgCntArea");
                     var tdArr = [];
                     for(var i=0; i<kaTalkCnt.length; i++) {
